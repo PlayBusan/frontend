@@ -2,7 +2,7 @@
   <div class="bg-slate-50">
     <Header />
 
-    <main class="mx-auto max-w-7xl px-4 pt-15 sm:px-6 lg:px-8">
+    <main class="pt-15">
       <slot />
     </main>
 
@@ -17,7 +17,9 @@
           💬
         </button>
 
-        <span class="pointer-events-none absolute right-full bottom-1/2 mr-3 hidden translate-y-1/2 whitespace-nowrap rounded-full bg-slate-900 px-3 py-1 text-xs font-medium text-white opacity-0 shadow-md transition-all duration-150 group-hover:block group-hover:opacity-100">
+        <span
+          class="pointer-events-none absolute right-full bottom-1/2 mr-3 hidden translate-y-1/2 whitespace-nowrap rounded-full bg-slate-900 px-3 py-1 text-xs font-medium text-white opacity-0 shadow-md transition-all duration-150 group-hover:block group-hover:opacity-100"
+        >
           AI 도우미
         </span>
       </div>
