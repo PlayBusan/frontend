@@ -26,8 +26,8 @@
     >
       <!-- 개별 플레이스 카드 -->
       <div
-        v-for="place in hotPlaces"
-        :key="place.id"
+        v-for="place in hotPlacesDuplicated"
+        :key="`${place.id}`"
         class="w-72 shrink-0 select-none overflow-hidden rounded-3xl bg-white shadow-md hover:shadow-xl transition-all duration-300 border border-slate-100"
       >
         <!-- 이미지 영역 -->
@@ -71,9 +71,8 @@
 </template>
 
 <script setup lang="ts">
-import { ref } from 'vue'
+import { onBeforeUnmount, onMounted, ref } from 'vue'
 
-// 실시간 핫플레이스 데이터 샘플
 const hotPlaces = ref([
   {
     id: 1,
@@ -117,30 +116,121 @@ const hotPlaces = ref([
   },
 ])
 
-// 마우스 드래그로 가로 스크롤 구현을 위한 로직
-const scrollContainer = ref<HTMLElement | null>(null)
-let isDown = false
+const hotPlacesDuplicated = [...hotPlaces.value, ...hotPlaces.value]
+
+const scrollContainer = ref<HTMLDivElement | null>(null)
+
+const isDragging = ref(false)
+
 let startX = 0
 let scrollLeft = 0
 
-const startDragging = (e: MouseEvent) => {
-  if (!scrollContainer.value) return
-  isDown = true
-  startX = e.pageX - scrollContainer.value.offsetLeft
-  scrollLeft = scrollContainer.value.scrollLeft
+let autoTimer: number | null = null
+let resumeTimer: number | null = null
+
+const startAutoScroll = () => {
+  stopAutoScroll()
+
+  autoTimer = window.setInterval(() => {
+    const el = scrollContainer.value
+    if (!el || isDragging.value) return
+
+    el.scrollLeft += 0.6
+
+    const half = el.scrollWidth / 2
+
+    if (el.scrollLeft >= half) {
+      el.scrollLeft -= half
+    }
+
+    if (el.scrollLeft <= 0) {
+      el.scrollLeft += half
+    }
+  }, 16)
 }
 
-const stopDragging = () => {
-  isDown = false
+const stopAutoScroll = () => {
+  if (autoTimer) {
+    clearInterval(autoTimer)
+    autoTimer = null
+  }
+}
+
+const resumeAutoScroll = () => {
+  if (resumeTimer) clearTimeout(resumeTimer)
+
+  resumeTimer = window.setTimeout(() => {
+    startAutoScroll()
+  }, 5000)
+}
+
+// ---------------- 드래그 ----------------
+
+const startDragging = (e: MouseEvent) => {
+  const el = scrollContainer.value
+  if (!el) return
+
+  isDragging.value = true
+
+  stopAutoScroll()
+
+  startX = e.pageX - el.offsetLeft
+  scrollLeft = el.scrollLeft
 }
 
 const onDragging = (e: MouseEvent) => {
-  if (!isDown || !scrollContainer.value) return
+  if (!isDragging.value) return
+
+  const el = scrollContainer.value
+  if (!el) return
+
   e.preventDefault()
-  const x = e.pageX - scrollContainer.value.offsetLeft
-  const walk = (x - startX) * 1.5 // 스크롤 감도 조절
-  scrollContainer.value.scrollLeft = scrollLeft - walk
+
+  const x = e.pageX - el.offsetLeft
+  const walk = (x - startX) * 1.4
+
+  el.scrollLeft = scrollLeft - walk
 }
+
+const stopDragging = () => {
+  if (!isDragging.value) return
+
+  isDragging.value = false
+
+  resumeAutoScroll()
+}
+
+// ---------------- wheel ----------------
+
+const handleWheel = () => {
+  stopAutoScroll()
+  resumeAutoScroll()
+}
+
+onMounted(() => {
+  if (scrollContainer.value) {
+    scrollContainer.value.scrollLeft = 0
+  }
+
+  startAutoScroll()
+
+  scrollContainer.value?.addEventListener('wheel', handleWheel, {
+    passive: true,
+  })
+
+  scrollContainer.value?.addEventListener('touchmove', handleWheel, {
+    passive: true,
+  })
+})
+
+onBeforeUnmount(() => {
+  stopAutoScroll()
+
+  if (resumeTimer) clearTimeout(resumeTimer)
+
+  scrollContainer.value?.removeEventListener('wheel', handleWheel)
+  scrollContainer.value?.removeEventListener('touchmove', handleWheel)
+})
 </script>
 
 <style scoped>

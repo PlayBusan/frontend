@@ -12,7 +12,7 @@
       <div class="relative z-10 text-center px-4">
         <h1 class="text-4xl text-slate-800">
           오늘 부산은
-          <span class="relative cursor-help font-bold">
+          <span class="relative cursor-help font-bold group inline-flex items-center">
             <span class="pb-1"> {{ weatherText }} 날 </span>
             <span class="text-4xl ml-1">
               {{ weatherEmoji }}
