@@ -80,7 +80,7 @@
           <div class="text-sm font-semibold opacity-80">BUSAN EVENT JSON</div>
           <h3 class="mt-3 text-lg font-bold">쌓여진 행사 정보, 날짜별로 한눈에.</h3>
           <p class="mt-3 text-sm opacity-80">캘린더에서 간편하게 일정을 확인해보세요.</p>
-          <button class="mt-6 w-full rounded-full bg-cyan-400 px-4 py-3 font-semibold text-slate-900">캘린더 열기</button>
+            <RouterLink to="/calendar" class="mt-6 block w-full rounded-full bg-cyan-400 px-4 py-3 text-center font-semibold text-slate-900">캘린더 열기</RouterLink>
         </div>
       </div>
     </div>
