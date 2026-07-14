@@ -15,9 +15,8 @@ html {
 
 body {
   margin: 0;
-  padding: 3rem 1rem;
   min-width: 320px;
-  min-height: 100vh;
+
   font-family:
     "Pretendard Variable",
     Pretendard,
@@ -28,7 +27,7 @@ body {
     sans-serif;
   color: #111827;
   background: #ffffff;
-  line-height: 1.5;
+  /* line-height: 1.5; */
   -webkit-font-smoothing: antialiased;
 }
 
