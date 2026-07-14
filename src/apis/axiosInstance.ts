@@ -1,6 +1,6 @@
 import axios from 'axios'
 
-const axiosInstance = axios.create({
+export const axiosInstance = axios.create({
   baseURL: import.meta.env.VITE_API_BASE_URL,
   timeout: 10000,
   headers: {
@@ -17,4 +17,6 @@ axiosInstance.interceptors.response.use(
   },
 )
 
-export default axiosInstance
+export const weatherApi = axios.create({
+  baseURL: 'https://api.openweathermap.org/data/2.5',
+})
