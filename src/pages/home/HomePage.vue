@@ -60,7 +60,7 @@
               <div class="text-xs font-semibold text-cyan-600">LOCAL TALK</div>
               <h3 class="mt-2 text-xl font-bold text-slate-900">지금 부산에서 나누는 이야기</h3>
             </div>
-            <div class="text-sm text-slate-400">전체 보기 ›</div>
+            <RouterLink to="/local" class="text-sm text-slate-400">전체 보기 ›</RouterLink>
           </div>
 
           <ul class="mt-4 space-y-3">
