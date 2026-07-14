@@ -1,8 +1,8 @@
 <template>
-  <header class="fixed top-0 left-0 z-50 w-full bg-[#0f3550] text-white">
+  <header class="fixed top-0 left-0 z-50 w-full bg-[#0f3550]/80 backdrop-blur-sm text-white border-b border-white/10">
     <div class="mx-auto flex h-16 max-w-7xl items-center justify-between px-6">
       <RouterLink to="/" class="flex items-center gap-3">
-        <span class="flex h-8 w-8 items-center justify-center rounded-full bg-cyan-400 text-slate-900 font-bold">파</span>
+        <span class="flex h-8 w-8 items-center justify-center rounded-full bg-cyan-400 text-slate-900 font-bold">🌊</span>
         <span class="font-semibold tracking-wide">부산놀러가요</span>
       </RouterLink>
 
