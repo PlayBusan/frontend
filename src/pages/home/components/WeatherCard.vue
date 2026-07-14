@@ -1,6 +1,6 @@
 <template>
    <article
-            class="relative flex min-h-[160px] flex-col justify-between overflow-hidden rounded-3xl bg-gradient-to-br from-[#0b2b48] to-[#164166] p-6 text-white shadow-xl"
+            class="bg-gradient-to-r from-cyan-500 to-blue-600 relative flex min-h-[160px] flex-col justify-between overflow-hidden rounded-3xl p-6 text-white shadow-xl"
           >
             <div class="flex items-start justify-between">
               <div>
