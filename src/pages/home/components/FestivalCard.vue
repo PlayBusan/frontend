@@ -67,12 +67,13 @@
                 </p>
               </div>
 
-              <button
-                class="flex shrink-0 items-center justify-center gap-1.5 rounded-xl bg-gradient-to-r from-cyan-500 to-blue-600 px-4 py-2.5 text-xs font-bold transition-all hover:opacity-90 active:scale-[0.97]"
+              <RouterLink
+                to="/calendar"
+                class="flex shrink-0 items-center justify-center gap-1.5 rounded-xl bg-gradient-to-r from-cyan-500 to-blue-600 px-4 py-2.5 text-xs font-bold text-white transition-all hover:opacity-90 active:scale-[0.97]"
               >
                 <span>📅</span>
                 <span>캘린더 열기</span>
-              </button>
+              </RouterLink>
             </section>
           </article>
 </template>

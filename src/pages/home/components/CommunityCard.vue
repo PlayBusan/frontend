@@ -17,11 +17,12 @@
                 </h2>
               </div>
 
-              <button
+              <RouterLink
+                to="/local"
                 class="text-xs font-semibold text-slate-400 transition-colors hover:text-slate-600"
               >
                 전체 보기 ›
-              </button>
+              </RouterLink>
             </header>
 
             <ul class="mt-4 space-y-2.5">
