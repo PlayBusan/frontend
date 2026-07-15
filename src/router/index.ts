@@ -6,6 +6,7 @@ import CalendarPage from '@/pages/calendar/CalendarPage.vue'
 import LocalTalkPage from '@/pages/local/LocalTalkPage.vue'
 import LocalPostDetail from '@/pages/local/LocalPostDetail.vue'
 import LocalWritePage from '@/pages/local/LocalWritePage.vue'
+import LocalEditPage from '@/pages/local/LocalEditPage.vue'
 import TourPage from '@/pages/tour/TourPage.vue'
 
 const router = createRouter({
@@ -43,7 +44,11 @@ const router = createRouter({
       props: true,
     },
     {
-      path: '/tour',
+      path: '/local/edit/:id',
+      name: 'localEdit',
+      component: LocalEditPage,
+    },
+    {path: '/tour',
       name: 'tour',
       component: TourPage,
     },
