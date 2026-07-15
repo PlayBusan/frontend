@@ -100,20 +100,6 @@ let scrollLeft = 0
 let autoTimer: number | null = null
 let resumeTimer: number | null = null
 
-// Fisher-Yates 셔플 알고리즘으로 무작위 8개 추출
-const getRandomPlaces = (list: Place[], count: number): Place[] => {
-  const shuffled = [...list]
-
-  for (let i = shuffled.length - 1; i > 0; i--) {
-    const j = Math.floor(Math.random() * (i + 1))
-    const temp = shuffled[i]!
-    shuffled[i] = shuffled[j]!
-    shuffled[j] = temp
-  }
-
-  return shuffled.slice(0, count)
-}
-
 /**
  * 축제 데이터 분류 분별기
  */
@@ -132,14 +118,7 @@ const isUpcomingFestival = (place: Place): boolean => {
   const today = new Date()
   today.setHours(0, 0, 0, 0)
 
-  const start = place.startDate.replace(/\D/g, '')
   const end = place.endDate.replace(/\D/g, '')
-
-  const startDate = new Date(
-    Number(start.slice(0, 4)),
-    Number(start.slice(4, 6)) - 1,
-    Number(start.slice(6, 8)),
-  )
 
   const endDate = new Date(
     Number(end.slice(0, 4)),
@@ -163,7 +142,8 @@ const moveToTour = (place: Place) => {
     path: '/tour',
     query: {
       title: place.name,
-      address: `${place.addr1} ${place.addr2}`,
+      address: `${place.addr1}`,
+      image: place.imageUrl,
     },
   })
 }
