@@ -2,6 +2,11 @@
 @import './base.css';
 @import './font.css';
 
+@theme {
+  --color-primary: #03237d;
+  --color-secondary: #9cb5fc;
+}
+
 *,
 *::before,
 *::after {

@@ -1,5 +1,5 @@
 <template>
-  <div class="min-h-screen bg-gradient-to-b from-cyan-50 via-white to-slate-50">
+  <div class="min-h-screen bg-gradient-to-b from-secondary/10 via-white to-slate-50">
     <!-- 메인 날씨 & 추천 영역 -->
     <section
       class="relative flex min-h-[40vh] flex-col items-center justify-center overflow-hidden bg-cover bg-center transition-all duration-1000 ease-in-out"
@@ -12,7 +12,10 @@
         <!-- 로딩 전후 처리 -->
         <h1 class="text-4xl text-white">
           오늘 부산은
-          <span v-if="weather" class="relative cursor-help font-bold group inline-flex items-center">
+          <span
+            v-if="weather"
+            class="relative cursor-help font-bold group inline-flex items-center"
+          >
             <span class="pb-1"> {{ weatherText }} 날 </span>
             <span class="text-4xl ml-1"> {{ weatherEmoji }} </span>
 
@@ -50,9 +53,7 @@
           <span v-else class="ml-2 animate-pulse">날씨 정보 불러오는 중...</span>
         </h1>
 
-        <h2 class="mt-3 text-5xl font-black text-white drop-shadow-md">
-          뭐 하고 놀까?
-        </h2>
+        <h2 class="mt-3 text-5xl font-black text-white drop-shadow-md">뭐 하고 놀까?</h2>
 
         <p class="mt-8 text-lg font-medium text-slate-100 drop-shadow-sm">
           {{ recommendation }}
@@ -94,7 +95,7 @@ onMounted(async () => {
     const res = await getCurrentWeather()
     weather.value = res.data
   } catch (error) {
-    console.error("날씨 정보를 가져오는데 실패했습니다.", error)
+    console.error('날씨 정보를 가져오는데 실패했습니다.', error)
   }
 })
 
@@ -119,7 +120,7 @@ const weatherText = computed(() => {
     Clouds: '구름이 조금 낀',
     Rain: '비가 오는',
     Snow: '눈이 내리는',
-    Thunderstorm: '천둥이 치는'
+    Thunderstorm: '천둥이 치는',
   }
   return map[main] || description.value
 })
@@ -132,7 +133,7 @@ const weatherEmoji = computed(() => {
     Clouds: '🌥️',
     Rain: '🌧️',
     Snow: '❄️',
-    Thunderstorm: '⛈️'
+    Thunderstorm: '⛈️',
   }
   return map[main] || '🌈'
 })
