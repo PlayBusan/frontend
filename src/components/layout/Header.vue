@@ -4,7 +4,7 @@
   >
     <div class="mx-auto flex h-16 max-w-7xl items-center justify-between px-6">
       <RouterLink to="/" class="flex items-center gap-3">
-        <span class="font-semibold tracking-wide">PLAY BUSAN</span>
+        <span class="font-semibold font-logo tracking-wide">PLAY BUSAN</span>
       </RouterLink>
 
       <nav>
