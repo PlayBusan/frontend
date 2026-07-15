@@ -1,15 +1,9 @@
-import OpenAI from "openai";
+import { axiosInstance } from './axiosInstance'
 
-const client = new OpenAI({
-  apiKey: import.meta.env.VITE_OPENAI_API_KEY,
-  dangerouslyAllowBrowser: true, // 개발용
-});
+export const askChat = async (message: string): Promise<string> => {
+  const { data } = await axiosInstance.post('/api/chatbot', {
+    message,
+  })
 
-export async function askChat(message: string) {
-  const response = await client.responses.create({
-    model: "gpt-5-mini",
-    input: message,
-  });
-
-  return response.output_text;
+  return data.reply
 }
