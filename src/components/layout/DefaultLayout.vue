@@ -2,7 +2,7 @@
   <div class="bg-slate-50">
     <Header />
 
-    <main class="mx-auto max-w-7xl px-4 pt-15 sm:px-6 lg:px-8">
+    <main class="pt-15">
       <slot />
     </main>
 

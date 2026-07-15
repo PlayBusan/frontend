@@ -1,14 +1,14 @@
 <!-- src/components/HotPlaces.vue -->
 <template>
-  <div class="w-full max-w-5xl px-6 py-12">
+  <div class="w-full max-w-7xl px-6 py-12">
     <div class="mb-6 flex items-end justify-between">
       <div>
-        <p class="text-xs font-semibold text-cyan-600 uppercase tracking-wider">
+        <p class="text-xs font-semibold text-primary/80 uppercase tracking-wider">
           실시간 핫플레이스
         </p>
         <h3 class="mt-1 text-2xl font-bold text-slate-800">지금 핫한 부산 명소</h3>
       </div>
-      <button class="text-sm font-medium text-slate-400 hover:text-slate-600 transition">
+      <button class="text-sm font-medium text-slate-400 hover:text-indigo-600 transition-colors">
         전체보기 &rarr;
       </button>
     </div>
@@ -16,7 +16,7 @@
     <!-- 가로 드래그/스크롤 영역 -->
     <div
       ref="scrollContainer"
-      class="flex gap-6 overflow-x-auto pb-4 scroll-smooth cursor-grab active:cursor-grabbing"
+      class="flex gap-6 overflow-x-auto pb-4 scroll-smooth cursor-grab active:cursor-grabbing select-none"
       @mousedown="startDragging"
       @mousemove="onDragging"
       @mouseup="stopDragging"
@@ -24,11 +24,17 @@
       :class="{ 'scrollbar-hide': true }"
       style="-ms-overflow-style: none; scrollbar-width: none"
     >
-      <!-- 개별 플레이스 카드 -->
+      <!-- 로딩 상태 처리 -->
+      <div v-if="loading" class="w-full py-12 text-center text-sm font-medium text-slate-400">
+        핫플레이스를 불러오는 중입니다...
+      </div>
+
+      <!-- 개별 플레이스 카드 (가공된 중복 리스트 루프) -->
       <div
-        v-for="place in hotPlacesDuplicated"
-        :key="`${place.id}`"
-        class="w-72 shrink-0 select-none overflow-hidden rounded-3xl bg-white shadow-md hover:shadow-xl transition-all duration-300 border border-slate-100"
+        v-else
+        v-for="(place, index) in hotPlacesDuplicated"
+        :key="`${place.id}-${index}`"
+        class="w-72 shrink-0 overflow-hidden rounded-3xl bg-white shadow-lg hover:shadow-xl transition-all duration-300 border border-slate-100"
       >
         <!-- 이미지 영역 -->
         <div class="relative h-44 w-full bg-slate-100">
@@ -36,34 +42,27 @@
             :src="place.imageUrl"
             :alt="place.name"
             class="h-full w-full object-cover pointer-events-none"
+            @error="
+              (e) => {
+                ;(e.target as HTMLImageElement).src =
+                  'https://images.unsplash.com/photo-1582967788606-a171c1080cb0?auto=format&fit=crop&w=600&q=80'
+              }
+            "
           />
-          <span
-            class="absolute top-4 left-4 rounded-full bg-white/90 backdrop-blur px-2.5 py-1 text-xs font-bold text-slate-800"
-          >
-            ★ {{ place.rating }}
-          </span>
         </div>
 
         <!-- 콘텐츠 영역 -->
         <div class="p-5">
-          <div class="flex flex-wrap gap-1 mb-2">
-            <span
-              v-for="tag in place.tags"
-              :key="tag"
-              class="text-[11px] font-semibold text-cyan-600 bg-cyan-50 px-2 py-0.5 rounded-md"
-            >
-              #{{ tag }}
-            </span>
+          <!-- 샵(#) 형태의 깔끔한 태그 적용 -->
+          <div class="mb-3 inline-flex items-center rounded-full bg-secondary/20 px-3 py-1">
+            <span class="text-xs font-bold text-primary"> #{{ place.type }} </span>
           </div>
-          <h4 class="text-lg font-bold text-slate-800">{{ place.name }}</h4>
-          <p class="mt-1 text-xs text-slate-400 line-clamp-2 leading-relaxed">
-            {{ place.description }}
-          </p>
-          <button
-            class="mt-4 w-full rounded-2xl bg-slate-50 py-2.5 text-xs font-semibold text-slate-700 hover:bg-cyan-500 hover:text-white transition duration-200"
-          >
-            상세보기
-          </button>
+
+          <h4 class="text-lg font-black text-slate-800 truncate">
+            {{ place.name }}
+          </h4>
+
+          <p class="text-sm text-gray-600">{{ place.addr1 }}</p>
         </div>
       </div>
     </div>
@@ -73,53 +72,22 @@
 <script setup lang="ts">
 import { onBeforeUnmount, onMounted, ref } from 'vue'
 
-const hotPlaces = ref([
-  {
-    id: 1,
-    name: '광안리 해변공원',
-    imageUrl:
-      'https://images.unsplash.com/photo-1570191845551-729837920da7?auto=format&fit=crop&w=600&q=80',
-    rating: 4.8,
-    tags: ['바다뷰', '산책하기좋은', '야경명소'],
-    description:
-      '구름 낀 선선한 날씨에 광안대교를 바라보며 해변가 산책길을 걸어보세요. 버스킹 구경은 덤!',
-  },
-  {
-    id: 2,
-    name: '영도 흰여울문화마을',
-    imageUrl:
-      'https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=600&q=80',
-    rating: 4.7,
-    tags: ['감성카페', '인생샷', '절벽마을'],
-    description:
-      '바다 절벽을 따라 늘어선 예쁜 골목길과 카페들. 해 질 녘 노을을 배경으로 인생샷을 건져보세요.',
-  },
-  {
-    id: 3,
-    name: '해운대 블루라인파크',
-    imageUrl:
-      'https://images.unsplash.com/photo-1542224566-6e85f2e6772f?auto=format&fit=crop&w=600&q=80',
-    rating: 4.6,
-    tags: ['캡슐열차', '이색체험', '데이트코스'],
-    description:
-      '동해남부선 옛 철길을 따라 해변 열차와 스카이캡슐을 타고 부산의 푸른 바다를 한눈에 담아보세요.',
-  },
-  {
-    id: 4,
-    name: '전포 사잇길 (전리단길)',
-    imageUrl:
-      'https://images.unsplash.com/photo-1498804103079-a6351b050096?auto=format&fit=crop&w=600&q=80',
-    rating: 4.5,
-    tags: ['소품샵투어', '이색맛집', '힙플레이스'],
-    description:
-      '아기자기한 독립 소품샵들과 힙한 감성의 로스터리 카페가 가득해 골목골목 구경하는 재미가 가득합니다.',
-  },
-])
+// TypeScript 인터페이스 정의 (icon 제거)
+interface Place {
+  id: number
+  name: string
+  imageUrl: string
+  type: string
+  addr1: string
+  addr2: string
+}
 
-const hotPlacesDuplicated = [...hotPlaces.value, ...hotPlaces.value]
+const rawPlaces = ref<Place[]>([])
+const selectedPlaces = ref<Place[]>([])
+const hotPlacesDuplicated = ref<Place[]>([])
+const loading = ref(true)
 
 const scrollContainer = ref<HTMLDivElement | null>(null)
-
 const isDragging = ref(false)
 
 let startX = 0
@@ -127,6 +95,92 @@ let scrollLeft = 0
 
 let autoTimer: number | null = null
 let resumeTimer: number | null = null
+
+// Fisher-Yates 셔플 알고리즘으로 무작위 8개 추출
+const getRandomPlaces = (list: Place[], count: number): Place[] => {
+  const shuffled = [...list]
+
+  for (let i = shuffled.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1))
+
+    const temp = shuffled[i]!
+    shuffled[i] = shuffled[j]!
+    shuffled[j] = temp
+  }
+
+  return shuffled.slice(0, count)
+}
+
+/**
+ * API에서 가져온 다양한 형태의 데이터를 안전하게 걸러내는 분별기(Parser) 함수 (아이콘 반환 제거)
+ */
+const getPlaceType = (item: any) => {
+  const code = item.lclsSystm3 || ''
+
+  if (code.startsWith('NA02')) return { type: '바다' }
+  if (code.startsWith('VE01')) return { type: '전망' }
+  if (code.startsWith('VE02')) return { type: '체험' }
+  if (code.startsWith('VE03')) return { type: '공원' }
+  if (code.startsWith('VE04')) return { type: '문화' }
+  if (code.startsWith('HS')) return { type: '역사' }
+  if (code.startsWith('EX05')) return { type: '힐링' }
+  if (code.startsWith('EX07')) return { type: '놀거리' }
+
+  return { type: '관광명소' }
+}
+
+const mapRawToPlace = (item: any): Place => {
+  const name = item.title || item.name || '부산 명소'
+
+  const imageUrl =
+    item.firstimage ||
+    item.imageUrl ||
+    'https://images.unsplash.com/photo-1582967788606-a171c1080cb0?auto=format&fit=crop&w=600&q=80'
+
+  const { type } = getPlaceType(item)
+
+  return {
+    id: Number(item.contentid),
+    name,
+    imageUrl,
+    type,
+    addr1: item.addr1 || '부산광역시',
+    addr2: item.addr2 || '',
+  }
+}
+
+// JSON Server 연동 데이터 Fetch
+const fetchHotPlaces = async () => {
+  try {
+    loading.value = true
+    const res = await fetch('http://localhost:5000/items')
+    if (!res.ok) throw new Error('네트워크 반응이 원활하지 않습니다.')
+
+    const rawData = await res.json()
+
+    console.log('API 원본 데이터 형태:', rawData)
+
+    if (Array.isArray(rawData)) {
+      rawPlaces.value = rawData.map(mapRawToPlace)
+    } else {
+      rawPlaces.value = []
+    }
+
+    if (rawPlaces.value.length > 0) {
+      selectedPlaces.value = getRandomPlaces(rawPlaces.value, Math.min(8, rawPlaces.value.length))
+      hotPlacesDuplicated.value = [...selectedPlaces.value, ...selectedPlaces.value]
+    }
+
+    console.log('선정된 핫플레이스:', selectedPlaces.value)
+    setTimeout(() => {
+      startAutoScroll()
+    }, 100)
+  } catch (error) {
+    console.error('JSON Server 연동 에러:', error)
+  } finally {
+    loading.value = false
+  }
+}
 
 const startAutoScroll = () => {
   stopAutoScroll()
@@ -136,13 +190,11 @@ const startAutoScroll = () => {
     if (!el || isDragging.value) return
 
     el.scrollLeft += 0.6
-
     const half = el.scrollWidth / 2
 
     if (el.scrollLeft >= half) {
       el.scrollLeft -= half
     }
-
     if (el.scrollLeft <= 0) {
       el.scrollLeft += half
     }
@@ -164,14 +216,13 @@ const resumeAutoScroll = () => {
   }, 5000)
 }
 
-// ---------------- 드래그 ----------------
+// ---------------- 드래그 컨트롤 ----------------
 
 const startDragging = (e: MouseEvent) => {
   const el = scrollContainer.value
   if (!el) return
 
   isDragging.value = true
-
   stopAutoScroll()
 
   startX = e.pageX - el.offsetLeft
@@ -196,23 +247,20 @@ const stopDragging = () => {
   if (!isDragging.value) return
 
   isDragging.value = false
-
   resumeAutoScroll()
 }
-
-// ---------------- wheel ----------------
 
 const handleWheel = () => {
   stopAutoScroll()
   resumeAutoScroll()
 }
 
-onMounted(() => {
+onMounted(async () => {
   if (scrollContainer.value) {
     scrollContainer.value.scrollLeft = 0
   }
 
-  startAutoScroll()
+  await fetchHotPlaces()
 
   scrollContainer.value?.addEventListener('wheel', handleWheel, {
     passive: true,
@@ -234,7 +282,6 @@ onBeforeUnmount(() => {
 </script>
 
 <style scoped>
-/* 크롬, 사파리, 오페라에서 스크롤바 숨기기 */
 .scrollbar-hide::-webkit-scrollbar {
   display: none;
 }
