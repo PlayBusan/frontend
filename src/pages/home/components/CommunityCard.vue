@@ -34,7 +34,7 @@
                   class="group flex flex-col justify-between rounded-2xl border border-slate-100 p-4 transition-all hover:border-cyan-200 hover:bg-cyan-50/10 sm:flex-row sm:items-center"
                 >
                   <div
-                    class="line-clamp-1 text-sm font-semibold text-slate-800 transition-colors group-hover:text-cyan-700"
+                    class="text-sm text-slate-800 transition-colors group-hover:text-cyan-700"
                   >
                     {{ p.title }}
                   </div>
