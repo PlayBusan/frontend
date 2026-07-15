@@ -34,6 +34,7 @@
       </div>
 
       <div
+        @click="moveToTour(place)"
         v-else
         v-for="(place, index) in hotPlacesDuplicated"
         :key="`${place.id}-${index}`"
@@ -151,6 +152,20 @@ const isUpcomingFestival = (place: Place): boolean => {
 
   // 진행 중이거나 앞으로 열릴 축제
   return endDate >= today
+}
+
+import { useRouter } from 'vue-router'
+
+const router = useRouter()
+
+const moveToTour = (place: Place) => {
+  router.push({
+    path: '/tour',
+    query: {
+      title: place.name,
+      address: `${place.addr1} ${place.addr2}`,
+    },
+  })
 }
 
 /**
