@@ -67,6 +67,7 @@
 
 <script setup lang="ts">
 import { ref, onMounted } from 'vue'
+import { fetchPostById } from '@/apis/posts'
 import { useRoute, useRouter } from 'vue-router'
 import {
   fetchPostById,
