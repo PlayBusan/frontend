@@ -1,4 +1,3 @@
-<!-- src/components/HotPlaces.vue -->
 <template>
   <div class="w-full max-w-7xl px-6 py-12">
     <div class="mb-6 flex items-end justify-between">
@@ -6,14 +5,13 @@
         <p class="text-xs font-semibold text-primary/80 uppercase tracking-wider">
           실시간 핫플레이스
         </p>
-        <h3 class="mt-1 text-2xl font-bold text-slate-800">지금 핫한 부산 명소</h3>
+        <h3 class="mt-1 text-2xl font-bold text-slate-800">지금 핫한 부산 축제</h3>
       </div>
       <button class="text-sm font-medium text-slate-400 hover:text-indigo-600 transition-colors">
         전체보기 &rarr;
       </button>
     </div>
 
-    <!-- 가로 드래그/스크롤 영역 -->
     <div
       ref="scrollContainer"
       class="flex gap-6 overflow-x-auto pb-4 scroll-smooth cursor-grab active:cursor-grabbing select-none"
@@ -24,19 +22,23 @@
       :class="{ 'scrollbar-hide': true }"
       style="-ms-overflow-style: none; scrollbar-width: none"
     >
-      <!-- 로딩 상태 처리 -->
       <div v-if="loading" class="w-full py-12 text-center text-sm font-medium text-slate-400">
-        핫플레이스를 불러오는 중입니다...
+        축제 정보를 불러오는 중입니다...
       </div>
 
-      <!-- 개별 플레이스 카드 (가공된 중복 리스트 루프) -->
+      <div
+        v-else-if="hotPlacesDuplicated.length === 0"
+        class="w-full py-12 text-center text-sm font-medium text-slate-400"
+      >
+        이번 달에 진행 중이거나 진행 예정인 축제가 없습니다.
+      </div>
+
       <div
         v-else
         v-for="(place, index) in hotPlacesDuplicated"
         :key="`${place.id}-${index}`"
         class="w-72 shrink-0 overflow-hidden rounded-3xl bg-white shadow-lg hover:shadow-xl transition-all duration-300 border border-slate-100"
       >
-        <!-- 이미지 영역 -->
         <div class="relative h-44 w-full bg-slate-100">
           <img
             :src="place.imageUrl"
@@ -51,18 +53,16 @@
           />
         </div>
 
-        <!-- 콘텐츠 영역 -->
         <div class="p-5">
-          <!-- 샵(#) 형태의 깔끔한 태그 적용 -->
           <div class="mb-3 inline-flex items-center rounded-full bg-secondary/20 px-3 py-1">
             <span class="text-xs font-bold text-primary"> #{{ place.type }} </span>
           </div>
 
-          <h4 class="text-lg font-black text-slate-800 truncate">
+          <h4 class="text-lg font-black text-slate-800 truncate" :title="place.name">
             {{ place.name }}
           </h4>
 
-          <p class="text-sm text-gray-600">{{ place.addr1 }}</p>
+          <p class="text-sm text-gray-600 truncate">{{ place.addr1 }}</p>
         </div>
       </div>
     </div>
@@ -71,8 +71,9 @@
 
 <script setup lang="ts">
 import { onBeforeUnmount, onMounted, ref } from 'vue'
+import { getFestivals } from '@/apis/festivalApi'
 
-// TypeScript 인터페이스 정의 (icon 제거)
+// TypeScript 인터페이스 정의
 interface Place {
   id: number
   name: string
@@ -80,6 +81,8 @@ interface Place {
   type: string
   addr1: string
   addr2: string
+  startDate: string // "20260426" 형태의 문자열 저장 예정
+  endDate: string // "20260426" 형태의 문자열 저장 예정
 }
 
 const rawPlaces = ref<Place[]>([])
@@ -102,7 +105,6 @@ const getRandomPlaces = (list: Place[], count: number): Place[] => {
 
   for (let i = shuffled.length - 1; i > 0; i--) {
     const j = Math.floor(Math.random() * (i + 1))
-
     const temp = shuffled[i]!
     shuffled[i] = shuffled[j]!
     shuffled[j] = temp
@@ -112,71 +114,97 @@ const getRandomPlaces = (list: Place[], count: number): Place[] => {
 }
 
 /**
- * API에서 가져온 다양한 형태의 데이터를 안전하게 걸러내는 분별기(Parser) 함수 (아이콘 반환 제거)
+ * 축제 데이터 분류 분별기
  */
 const getPlaceType = (item: any) => {
-  const code = item.lclsSystm3 || ''
+  const code = item.lcls_systm3 || item.lcls_systm1 || ''
 
-  if (code.startsWith('NA02')) return { type: '바다' }
-  if (code.startsWith('VE01')) return { type: '전망' }
-  if (code.startsWith('VE02')) return { type: '체험' }
-  if (code.startsWith('VE03')) return { type: '공원' }
-  if (code.startsWith('VE04')) return { type: '문화' }
-  if (code.startsWith('HS')) return { type: '역사' }
-  if (code.startsWith('EX05')) return { type: '힐링' }
-  if (code.startsWith('EX07')) return { type: '놀거리' }
+  if (code.startsWith('EV01')) return { type: '축제' }
+  if (code.startsWith('EV02') || code.startsWith('EV')) return { type: '행사' }
 
-  return { type: '관광명소' }
+  return { type: '부산축제' }
 }
 
+const isUpcomingFestival = (place: Place): boolean => {
+  if (!place.startDate || !place.endDate) return false
+
+  const today = new Date()
+  today.setHours(0, 0, 0, 0)
+
+  const start = place.startDate.replace(/\D/g, '')
+  const end = place.endDate.replace(/\D/g, '')
+
+  const startDate = new Date(
+    Number(start.slice(0, 4)),
+    Number(start.slice(4, 6)) - 1,
+    Number(start.slice(6, 8)),
+  )
+
+  const endDate = new Date(
+    Number(end.slice(0, 4)),
+    Number(end.slice(4, 6)) - 1,
+    Number(end.slice(6, 8)),
+    23,
+    59,
+    59,
+  )
+
+  // 진행 중이거나 앞으로 열릴 축제
+  return endDate >= today
+}
+
+/**
+ * 새로운 API의 축제 데이터 규격을 컴포넌트 내부 Place 구조로 맵핑
+ */
 const mapRawToPlace = (item: any): Place => {
-  const name = item.title || item.name || '부산 명소'
-
-  const imageUrl =
-    item.firstimage ||
-    item.imageUrl ||
-    'https://images.unsplash.com/photo-1582967788606-a171c1080cb0?auto=format&fit=crop&w=600&q=80'
-
   const { type } = getPlaceType(item)
 
   return {
-    id: Number(item.contentid),
-    name,
-    imageUrl,
+    id: Number(item.content_id ?? item.contentid),
+    name: item.title ?? '부산 축제',
+    imageUrl:
+      item.first_image ||
+      item.firstimage ||
+      item.first_image2 ||
+      item.firstimage2 ||
+      'https://images.unsplash.com/photo-1582967788606-a171c1080cb0?auto=format&fit=crop&w=600&q=80',
     type,
-    addr1: item.addr1 || '부산광역시',
-    addr2: item.addr2 || '',
+    addr1: item.addr1 ?? '부산광역시',
+    addr2: item.addr2 ?? '',
+    startDate: item.eventstartdate ?? '',
+    endDate: item.eventenddate ?? '',
   }
 }
 
-// JSON Server 연동 데이터 Fetch
-const fetchHotPlaces = async () => {
+// 축제 API 호출 및 가공
+const fetchFestivalPlaces = async () => {
   try {
     loading.value = true
-    const res = await fetch('http://localhost:5000/items')
-    if (!res.ok) throw new Error('네트워크 반응이 원활하지 않습니다.')
 
-    const rawData = await res.json()
+    const response = await getFestivals()
 
-    console.log('API 원본 데이터 형태:', rawData)
+    // 배열이든 {data:[]}든 둘 다 대응
+    const rawData = Array.isArray(response.data) ? response.data : response.data.data
 
-    if (Array.isArray(rawData)) {
-      rawPlaces.value = rawData.map(mapRawToPlace)
-    } else {
+    if (!Array.isArray(rawData)) {
       rawPlaces.value = []
+      hotPlacesDuplicated.value = []
+      return
     }
 
-    if (rawPlaces.value.length > 0) {
-      selectedPlaces.value = getRandomPlaces(rawPlaces.value, Math.min(8, rawPlaces.value.length))
-      hotPlacesDuplicated.value = [...selectedPlaces.value, ...selectedPlaces.value]
-    }
+    rawPlaces.value = rawData
+      .map(mapRawToPlace)
+      .filter(isUpcomingFestival)
+      .sort((a, b) => a.startDate.localeCompare(b.startDate))
 
-    console.log('선정된 핫플레이스:', selectedPlaces.value)
-    setTimeout(() => {
-      startAutoScroll()
-    }, 100)
-  } catch (error) {
-    console.error('JSON Server 연동 에러:', error)
+    // 가장 가까운 축제 8개
+    selectedPlaces.value = rawPlaces.value.slice(0, 8)
+
+    hotPlacesDuplicated.value = [...selectedPlaces.value, ...selectedPlaces.value]
+
+    setTimeout(startAutoScroll, 100)
+  } catch (e) {
+    console.error(e)
   } finally {
     loading.value = false
   }
@@ -260,7 +288,8 @@ onMounted(async () => {
     scrollContainer.value.scrollLeft = 0
   }
 
-  await fetchHotPlaces()
+  // 컴포넌트 마운트 시 축제 API 실행
+  await fetchFestivalPlaces()
 
   scrollContainer.value?.addEventListener('wheel', handleWheel, {
     passive: true,
