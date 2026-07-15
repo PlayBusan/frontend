@@ -1,13 +1,13 @@
 <!-- src/views/Home.vue -->
 <template>
-  <div class="min-h-screen bg-gradient-to-b from-cyan-50 via-white to-slate-50">
+  <div class="min-h-screen bg-gradient-to-b from-secondary/10 via-white to-slate-50">
     <!-- 메인 날씨 & 추천 영역 -->
     <section
       class="relative flex min-h-[40vh] flex-col items-center justify-center overflow-hidden"
     >
       <!-- Background -->
-      <div class="absolute left-20 top-32 h-72 w-72 rounded-full bg-cyan-300/20 blur-3xl" />
-      <div class="absolute right-20 bottom-10 h-80 w-80 rounded-full bg-blue-300/20 blur-3xl" />
+      <div class="absolute left-20 top-32 h-72 w-72 rounded-full bg-primary/5 blur-3xl" />
+      <div class="absolute right-20 bottom-10 h-80 w-80 rounded-full bg-primary/5 blur-3xl" />
 
       <div class="relative z-10 text-center px-4">
         <h1 class="text-4xl text-slate-800">
@@ -65,7 +65,7 @@
         </h1>
 
         <h2
-          class="mt-3 bg-gradient-to-r from-cyan-500 to-blue-600 bg-clip-text text-5xl font-black text-transparent"
+          class="mt-3 bg-gradient-to-r from-primary to-secondary bg-clip-text text-5xl font-black text-transparent"
         >
           뭐 하고 놀까?
         </h2>
