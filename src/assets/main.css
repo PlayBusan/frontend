@@ -5,6 +5,8 @@
 @theme {
   --color-primary: #03237d;
   --color-secondary: #9cb5fc;
+
+  --font-logo: 'KerisKeduLine';
 }
 
 *,
