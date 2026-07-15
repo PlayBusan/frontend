@@ -29,7 +29,7 @@
           </li>
           <li>
             <RouterLink
-              to="/guide"
+              to="/tour"
               class="transition hover:text-cyan-500"
               active-class="font-semibold text-cyan-500"
             >
