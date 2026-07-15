@@ -76,7 +76,7 @@
 
         <!-- [오른쪽 캘린더] 메인 바디 영역 (부모 높이 제한 해제하여 자체 스크롤 완전 제거) -->
         <div
-          class="flex-1 w-full rounded-3xl border border-gray-300/40 p-6 shadow-xl shadow-slate-100/30 backdrop-blur-md flex flex-col transition-all duration-300 hover:shadow-2xl hover:shadow-slate-200/30 bg-white/70"
+          class="flex-1 w-full rounded-3xl border border-primary/20 p-6 shadow-xl shadow-slate-100/30 backdrop-blur-md flex flex-col transition-all duration-300 hover:shadow-2xl hover:shadow-slate-200/30 bg-white/70"
         >
           <FullCalendar class="w-full" :options="calendarOptions" />
         </div>
