@@ -12,7 +12,6 @@ export const loadKakaoMap = (): Promise<void> => {
       import.meta.env.VITE_KAKAO_MAP_KEY
     }&libraries=services`
 
-    console.log(import.meta.env.VITE_KAKAO_MAP_KEY)
     script.async = true
 
     script.onload = () => {
