@@ -18,3 +18,26 @@ export const createPost = (payload: {
 }) => {
   return axiosInstance.post('/api/posts', payload)
 }
+
+export const updatePost = (
+  id: number | string,
+  payload: {
+    title: string
+    content: string
+    password: string
+    category: string
+  },
+) => {
+  return axiosInstance.put(`/api/posts/${id}`, payload)
+}
+
+export const deletePost = (
+  id: number | string,
+  password: string,
+) => {
+  return axiosInstance.delete(`/api/posts/${id}`, {
+    data: {
+      password,
+    },
+  })
+}
