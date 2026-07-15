@@ -11,7 +11,7 @@
         <ul class="flex items-center gap-6 text-sm font-medium">
           <li>
             <RouterLink
-              to="/"
+              to="/local"
               class="transition hover:text-cyan-500"
               active-class="font-semibold text-cyan-500"
             >
