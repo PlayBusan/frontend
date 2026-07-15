@@ -86,7 +86,7 @@
                 <div
                   class="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-gradient-to-br from-secondary/30 to-secondary/10 text-xl border border-secondary/20 shadow-inner group-hover:from-secondary/50 group-hover:to-secondary/20 transition-all duration-200"
                 >
-                  {{ post.icon }}
+                  {{ getCategoryIcon(post.category) }}
                 </div>
                 <div>
                   <div class="text-xs font-semibold text-primary uppercase tracking-wider">
@@ -98,7 +98,7 @@
                     {{ post.title }}
                   </div>
                   <div class="mt-2 text-sm text-slate-500 line-clamp-2 leading-relaxed">
-                    {{ post.excerpt }}
+                    {{ post.excerpt || post.content?.slice(0, 120) }}
                   </div>
                 </div>
               </div>
@@ -107,7 +107,7 @@
               <div
                 class="flex sm:flex-col justify-between items-center sm:items-end text-sm text-slate-400 border-t sm:border-t-0 pt-3 sm:pt-0 border-slate-100"
               >
-                <div class="font-medium text-slate-400">{{ post.date }}</div>
+                <div class="font-medium text-slate-400">{{ post.created_at }}</div>
                 <div
                   class="mt-0 sm:mt-2 flex items-center gap-1.5 bg-slate-100/50 px-2.5 py-1 rounded-lg text-xs font-semibold text-slate-500"
                 >
@@ -148,77 +148,59 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, onMounted } from 'vue'
+import { ref, computed, watch, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
+import { fetchPosts } from '@/apis/posts'
 
 const router = useRouter()
-const raw = localStorage.getItem('local_posts')
-const initial = raw
-  ? JSON.parse(raw)
-  : [
-      {
-        id: 1,
-        icon: '🎪',
-        category: '축제·행사',
-        title: '바다축제 갈 때 도자기 챙겨야 할까요?',
-        excerpt:
-          '해운대 쪽 잔디 구역에서 볼 예정이에요. 작년에 다녀오신 분들 있으면 자리 잡기 좋은 시간도 알려주세요!',
-        date: '2026.07.14',
-        views: 124,
-      },
-      {
-        id: 2,
-        icon: '☕',
-        category: '맛집',
-        title: '기장 쪽 조용한 브런치 카페 추천',
-        excerpt:
-          '주말 오전에 바다 보면서 커피 마시기 좋은 곳을 찾고 있어요. 주차 가능한 곳이면 더 좋아요.',
-        date: '2026.07.13',
-        views: 86,
-      },
-      {
-        id: 3,
-        icon: '🗺️',
-        category: '여행지',
-        title: '힐여운문화마을에 괜찮은 산책 코스',
-        excerpt:
-          '절영해안산책로에서 힐여운문화마을로 이어지는 길을 추천합니다. 편한 신발은 필수예요!',
-        date: '2026.07.12',
-        views: 201,
-      },
-      {
-        id: 4,
-        icon: '💬',
-        category: '자유수다',
-        title: '부산 초보의 장마철 이동 팁',
-        excerpt: '부산 여행 처음인데 비 예보가 있네요. 비 오는 날에도 분위기 좋은 동네가 있을까요?',
-        date: '2026.07.11',
-        views: 59,
-      },
-    ]
-
-const posts = ref(initial)
+const posts = ref<any[]>([])
 const search = ref('')
 const category = ref('전체')
 const sort = ref('new')
-
 const page = ref(1)
 const perPage = ref(6)
 
-onMounted(() => {
-  if (!raw) localStorage.setItem('local_posts', JSON.stringify(initial))
+const categories = computed(() => ['전체', '축제·행사', '여행지', '맛집', '자유수다'])
+
+const getCategoryIcon = (categoryValue: string) => {
+  switch (categoryValue) {
+    case '축제·행사':
+      return '🎪'
+    case '여행지':
+      return '🗺️'
+    case '맛집':
+      return '☕'
+    case '자유수다':
+      return '💬'
+    default:
+      return '📰'
+  }
+}
+
+const loadPosts = async () => {
+  try {
+    const res = await fetchPosts(category.value)
+    posts.value = res.data
+  } catch (error) {
+    console.error('게시글 목록 조회 실패', error)
+    posts.value = []
+  }
+}
+
+watch(category, () => {
+  page.value = 1
+  loadPosts()
 })
 
-const categories = computed(() => ['전체', '축제·행사', '여행지', '맛집', '자유수다'])
+onMounted(() => {
+  loadPosts()
+})
 
 const filtered = computed(() => {
   let list = posts.value.slice()
-  if (category.value !== '전체') {
-    list = list.filter((p: any) => p.category === category.value)
-  }
   if (search.value.trim()) {
     const q = search.value.toLowerCase()
-    list = list.filter((p: any) => (p.title + ' ' + (p.excerpt || '')).toLowerCase().includes(q))
+    list = list.filter((p: any) => (p.title + ' ' + (p.content || '')).toLowerCase().includes(q))
   }
   if (sort.value === 'new') {
     list.sort((a: any, b: any) => (b.id || 0) - (a.id || 0))

@@ -26,6 +26,22 @@
           <textarea v-model="form.content" rows="6" class="mt-2 w-full rounded-md border px-3 py-2" />
         </div>
 
+        <div>
+          <label class="text-sm text-slate-600">작성자 닉네임</label>
+          <input v-model="form.nickname" class="mt-2 w-full rounded-md border px-3 py-2" placeholder="닉네임을 입력하세요" required />
+        </div>
+
+        <div>
+          <label class="text-sm text-slate-600">비밀번호</label>
+          <input
+            v-model="form.password"
+            type="password"
+            class="mt-2 w-full rounded-md border px-3 py-2"
+            placeholder="비밀번호를 입력하세요"
+            required
+          />
+        </div>
+
         <div class="flex items-center gap-2">
           <button type="submit" class="rounded-full bg-cyan-600 px-4 py-2 text-white">저장</button>
           <RouterLink to="/local" class="text-sm text-slate-500">취소</RouterLink>
@@ -38,6 +54,7 @@
 <script setup lang="ts">
 import { reactive } from 'vue'
 import { useRouter } from 'vue-router'
+import { createPost } from '@/apis/posts'
 
 const router = useRouter()
 
@@ -45,24 +62,22 @@ const form = reactive({
   category: '축제·행사',
   title: '',
   content: '',
+  nickname: '',
+  password: '',
 })
 
-function submit() {
-  const raw = localStorage.getItem('local_posts')
-  const list = raw ? JSON.parse(raw) : []
-  const id = Date.now()
-  const post = {
-    id,
-    icon: '💬',
-    category: form.category,
-    title: form.title,
-    excerpt: form.content.slice(0, 200),
-    content: form.content,
-    date: new Date().toISOString().slice(0, 10),
-    views: 0,
+const submit = async () => {
+  try {
+    await createPost({
+      title: form.title,
+      content: form.content,
+      category: form.category,
+      nickname: form.nickname || '익명',
+      password: form.password || '0000',
+    })
+    router.push('/local')
+  } catch (error) {
+    console.error('게시글 작성 실패', error)
   }
-  list.unshift(post)
-  localStorage.setItem('local_posts', JSON.stringify(list))
-  router.push('/local')
 }
 </script>
