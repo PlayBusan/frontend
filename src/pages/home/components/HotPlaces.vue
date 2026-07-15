@@ -8,7 +8,7 @@
         <h3 class="mt-1 text-2xl font-bold text-slate-800">지금 핫한 부산 축제</h3>
       </div>
       <button class="text-sm font-medium text-slate-400 hover:text-indigo-600 transition-colors">
-        전체보기 &rarr;
+        전체보기
       </button>
     </div>
 

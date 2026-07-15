@@ -11,6 +11,11 @@ import { getFestivals } from '@/apis/festivalApi'
 const route = useRoute()
 const mapContainer = ref<HTMLDivElement | null>(null)
 
+const emit = defineEmits<{
+  (e: 'loadedFestivals', festivals: any[]): void
+  (e: 'selectFestival', festival: any): void
+}>()
+
 const getRandomItems = (list: any[], count: number) => {
   const shuffled = [...list]
 
@@ -154,7 +159,9 @@ onMounted(async () => {
 
   const randomFestivals = getRandomItems(rawData, 8)
 
-  randomFestivals.forEach((festival: any) => {
+  emit('loadedFestivals', randomFestivals)
+
+  randomFestivals.forEach((festival) => {
     createMarker(map, {
       title: festival.title,
       address: festival.addr1,
