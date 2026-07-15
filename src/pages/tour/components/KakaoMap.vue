@@ -1,30 +1,5 @@
 <template>
-  <div class="relative w-full h-screen">
-    <div ref="mapContainer" class="w-full h-full rounded-xl"></div>
-
-    <!-- 마커 클릭시 카드 -->
-    <div v-if="selectedFestival" class="absolute bottom-8 left-1/2 -translate-x-1/2 z-50">
-      <div class="w-72 overflow-hidden rounded-3xl bg-white shadow-xl border border-slate-100">
-        <div class="relative h-44 w-full bg-slate-100">
-          <img :src="selectedFestival.image" class="h-full w-full object-cover" />
-        </div>
-
-        <div class="p-5">
-          <div class="mb-3 inline-flex rounded-full bg-secondary/20 px-3 py-1">
-            <span class="text-xs font-bold text-primary"> #축제 </span>
-          </div>
-
-          <h4 class="text-lg font-black text-slate-800">
-            {{ selectedFestival.title }}
-          </h4>
-
-          <p class="text-sm text-gray-600">
-            {{ selectedFestival.address }}
-          </p>
-        </div>
-      </div>
-    </div>
-  </div>
+  <div ref="mapContainer" class="w-full h-screen rounded-xl"></div>
 </template>
 
 <script setup lang="ts">
@@ -34,11 +9,6 @@ import { loadKakaoMap } from '@/utils/loadKakaoMap'
 
 const route = useRoute()
 const mapContainer = ref<HTMLDivElement | null>(null)
-const selectedFestival = ref<any>(null)
-
-const title = route.query.title as string
-const address = route.query.address as string
-const image = route.query.image as string
 
 onMounted(async () => {
   await loadKakaoMap()
@@ -50,7 +20,9 @@ onMounted(async () => {
     level: 5,
   })
 
-  const address = route.query.address as string
+  const title = (route.query.title as string) ?? ''
+  const address = (route.query.address as string) ?? ''
+  const image = (route.query.image as string) ?? ''
 
   if (!address) return
 
@@ -61,27 +33,88 @@ onMounted(async () => {
 
     const coords = new window.kakao.maps.LatLng(Number(result[0].y), Number(result[0].x))
 
+    map.setCenter(coords)
+
     const marker = new window.kakao.maps.Marker({
       map,
       position: coords,
     })
 
-    map.setCenter(coords)
+    // 카드 HTML
+    const content = `
+      <div style="
+        width:288px;
+        overflow:hidden;
+        border-radius:24px;
+        background:#fff;
+        box-shadow:0 10px 30px rgba(0,0,0,.18);
+        border:1px solid #e5e7eb;
+      ">
+        <img
+          src="${image}"
+          style="
+            width:100%;
+            height:176px;
+            object-fit:cover;
+            display:block;
+          "
+          onerror="this.src='https://images.unsplash.com/photo-1582967788606-a171c1080cb0?auto=format&fit=crop&w=600&q=80'"
+        />
 
-    console.log(image, title, address)
+        <div style="padding:20px">
+          <div
+            style="
+              display:inline-block;
+              padding:4px 12px;
+              border-radius:999px;
+              background:#eef2ff;
+              color:#4f46e5;
+              font-size:12px;
+              font-weight:bold;
+            "
+          >
+            #축제
+          </div>
 
-    // 마우스를 올리면 카드 표시
-    window.kakao.maps.event.addListener(marker, 'mouseover', () => {
-      selectedFestival.value = {
-        title,
-        address,
-        image,
-      }
+          <div
+            style="
+              margin-top:12px;
+              font-size:18px;
+              font-weight:800;
+              color:#1e293b;
+            "
+          >
+            ${title}
+          </div>
+
+          <div
+            style="
+              margin-top:8px;
+              color:#64748b;
+              font-size:14px;
+            "
+          >
+            ${address}
+          </div>
+        </div>
+      </div>
+    `
+
+    const overlay = new window.kakao.maps.CustomOverlay({
+      content,
+      position: coords,
+      yAnchor: 1.25,
+      xAnchor: 0.5,
     })
 
-    // 마우스를 떼면 카드 숨김
+    // 마우스 올리면 카드
+    window.kakao.maps.event.addListener(marker, 'mouseover', () => {
+      overlay.setMap(map)
+    })
+
+    // 마우스 떼면 카드 숨김
     window.kakao.maps.event.addListener(marker, 'mouseout', () => {
-      selectedFestival.value = null
+      overlay.setMap(null)
     })
   })
 })
