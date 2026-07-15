@@ -5,7 +5,7 @@
     <div v-if="post" class="mt-6 rounded-2xl bg-white p-6 shadow">
       <div class="flex items-start justify-between">
         <div>
-          <div class="text-xs text-slate-500">{{ post.category }} · {{ post.date }}</div>
+          <div class="text-xs text-slate-500">{{ post.category }} · {{ post.created_at }}</div>
           <h1 class="mt-2 text-2xl font-bold text-slate-900">{{ post.title }}</h1>
           <div class="mt-4 text-sm text-slate-700">{{ post.excerpt }}</div>
         </div>
@@ -25,24 +25,23 @@
 <script setup lang="ts">
 import { ref, onMounted } from 'vue'
 import { useRoute } from 'vue-router'
+import { fetchPostById } from '@/apis/posts'
 
 const route = useRoute()
 const id = route.params.id as string
-const post = ref(null)
+const post = ref<any>(null)
 
-function loadPosts() {
-  const raw = localStorage.getItem('local_posts')
-  const list = raw ? JSON.parse(raw) : []
-  const found = list.find((p: any) => String(p.id) === String(id))
-  if (found) {
-    // increment views and persist
-    found.views = (found.views || 0) + 1
-    post.value = found
-    localStorage.setItem('local_posts', JSON.stringify(list))
+const loadPost = async () => {
+  try {
+    const res = await fetchPostById(id)
+    post.value = res.data
+  } catch (error) {
+    console.error('게시글 조회 실패', error)
+    post.value = null
   }
 }
 
 onMounted(() => {
-  loadPosts()
+  loadPost()
 })
 </script>
