@@ -23,12 +23,13 @@ const getRandomItems = (list: any[], count: number) => {
 }
 
 const createMarker = (
-  map: kakao.maps.Map,
+  map: any,
   festival: {
     title: string
     address: string
     image: string
   },
+  moveCenter = false,
 ) => {
   const geocoder = new window.kakao.maps.services.Geocoder()
 
@@ -36,6 +37,10 @@ const createMarker = (
     if (status !== window.kakao.maps.services.Status.OK) return
 
     const coords = new window.kakao.maps.LatLng(Number(result[0].y), Number(result[0].x))
+
+    if (moveCenter) {
+      map.setCenter(coords)
+    }
 
     const marker = new window.kakao.maps.Marker({
       map,
@@ -109,6 +114,7 @@ const createMarker = (
     })
   })
 }
+
 onMounted(async () => {
   await loadKakaoMap()
 
@@ -126,11 +132,15 @@ onMounted(async () => {
   // HotPlace에서 넘어온 경우
   // =========================
   if (address) {
-    createMarker(map, {
-      title,
-      address,
-      image,
-    })
+    createMarker(
+      map,
+      {
+        title,
+        address,
+        image,
+      },
+      true,
+    )
 
     return
   }
