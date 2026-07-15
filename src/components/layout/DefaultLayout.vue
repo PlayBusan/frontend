@@ -11,7 +11,7 @@
       <div class="group relative">
         <button
           aria-label="Open chat"
-          class="flex flex-col gap-0.5 p-2 w-14 h-14 items-center justify-center rounded-full shadow-lg transition-transform duration-150 hover:scale-105"
+          class="flex flex-col gap-0.5 p-3 w-16 h-16 bg-white border-primary items-center justify-center rounded-full shadow-lg transition-transform duration-150 hover:scale-105"
           @click="openChat"
         >
           <img :src="chatbotIcon" alt="AI 도우미" class="h-6 w-6 object-contain" />
