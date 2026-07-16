@@ -2,7 +2,8 @@
   <div class="bg-slate-50">
     <Header />
 
-    <main class="pt-15">
+
+  <main :class="route.path === '/tour' ? '' : 'pt-16'">
       <slot />
     </main>
 
@@ -31,11 +32,13 @@
 
 <script setup lang="ts">
 import { ref } from 'vue'
+import { useRoute } from 'vue-router'
 
 import Header from '@/components/layout/Header.vue'
 import Chatbot from '@/components/Chatbot.vue'
 import chatbotIcon from '@/assets/chatbot-icon.png'
 
+const route = useRoute()
 const showChat = ref(false)
 
 const openChat = () => {
