@@ -104,14 +104,14 @@
             @click="goEdit"
             class="
               rounded-xl
-              bg-blue-600
-              px-6
-              py-3
+              bg-yellow-100
+              px-4
+              py-1
               text-sm
               font-semibold
-              text-white
+              text-orange-700
               transition
-              hover:bg-blue-700
+              hover:bg-yellow-200
               active:scale-95
             "
           >
@@ -123,14 +123,14 @@
             @click="removePost"
             class="
               rounded-xl
-              bg-red-500
-              px-6
-              py-3
+              bg-pink-100
+              px-4
+              py-1
               text-sm
               font-semibold
-              text-white
+              text-red-600
               transition
-              hover:bg-red-600
+              hover:bg-pink-200
               active:scale-95
             "
           >
