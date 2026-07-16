@@ -178,6 +178,10 @@ onMounted(async () => {
       first_image:
         image ||
         'https://images.unsplash.com/photo-1582967788606-a171c1080cb0?auto=format&fit=crop&w=600&q=80',
+      image:
+        image ||
+        'https://images.unsplash.com/photo-1582967788606-a171c1080cb0?auto=format&fit=crop&w=600&q=80',
+      address,
     }
 
     emit('loadedFestivals', [selectedFestival])
@@ -191,7 +195,7 @@ onMounted(async () => {
         content_id: selectedFestival.content_id,
         title,
         address,
-        image,
+        image: selectedFestival.image,
       },
       true,
     )
