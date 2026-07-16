@@ -1,8 +1,6 @@
 <template>
   <div class="min-h-screen bg-gradient-to-b from-blue-50 to-white px-4 py-10">
-
     <div class="mx-auto max-w-4xl">
-
 
       <!-- 목록 이동 -->
       <RouterLink
