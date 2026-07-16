@@ -1,7 +1,7 @@
 <template>
   <div class="relative h-screen">
     <!-- SideBar 클릭 시 handleSelectFestival 실행 -->
-    <SideBar :festivals="festivals" @selectFestival="handleSelectFestival" />
+    <SideBar :festivals="festivals" :selectedFestival="selectedFestival" @selectFestival="handleSelectFestival" />
 
     <!-- KakaoMap @selectFestival 클릭 시에도 동일하게 handleSelectFestival 실행 -->
     <KakaoMap 

@@ -91,6 +91,7 @@ import dayGridPlugin from '@fullcalendar/daygrid'
 import interactionPlugin from '@fullcalendar/interaction'
 
 import { ref, computed, onMounted } from 'vue'
+import { useRouter } from 'vue-router'
 import { getFestivalsByMonth } from '@/apis/festivalApi'
 
 
@@ -102,6 +103,7 @@ const currentYearMonth = ref({
   month: 7,
 })
 
+const router = useRouter()
 
 /**
  * FullCalendar 이벤트 데이터
@@ -189,6 +191,8 @@ const convertCalendarEvents = (festivals: any[]) => {
     extendedProps: {
       contentId: festival.content_id,
       address: festival.addr1,
+      image:
+        festival.first_image || festival.firstimage || festival.first_image2 || festival.firstimage2 || '',
     },
 
   }))
@@ -311,6 +315,20 @@ const calendarOptions = ref({
 
   },
 
+  eventClick: (info: any) => {
+    const event = info.event
+    const props = event.extendedProps || {}
+
+    router.push({
+      name: 'tour',
+      query: {
+        title: event.title,
+        address: props.address || '',
+        contentId: props.contentId || '',
+        image: props.image || '',
+      },
+    })
+  },
 
   /**
    * API 이벤트 연결
