@@ -103,6 +103,44 @@
       >
         존재하지 않는 게시물입니다.
       </div>
+
+      <div class="mt-10 rounded-3xl border border-slate-100 bg-white p-8 shadow-sm">
+        <h2 class="text-xl font-bold text-slate-900">댓글</h2>
+
+        <div class="mt-6 space-y-4">
+          <div v-if="comments.length === 0" class="rounded-2xl bg-slate-50 p-6 text-sm text-slate-500">
+            아직 등록된 댓글이 없습니다.
+          </div>
+
+          <div v-for="comment in comments" :key="comment.id" class="rounded-3xl border border-slate-200 bg-slate-50 p-5">
+            <div class="flex items-center justify-between gap-3">
+              <div>
+                <p class="text-sm font-semibold text-slate-800">{{ comment.nickname }}</p>
+                <p class="text-xs text-slate-500">댓글 내용</p>
+              </div>
+            </div>
+            <p class="mt-4 text-sm leading-7 text-slate-700">{{ comment.content }}</p>
+          </div>
+        </div>
+
+        <div class="mt-8">
+          <textarea
+            v-model="newComment"
+            rows="4"
+            placeholder="댓글을 입력하세요."
+            class="w-full rounded-3xl border border-slate-200 px-4 py-3 text-sm text-slate-700 outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-100"
+          ></textarea>
+
+          <div class="mt-4 flex justify-end">
+            <button
+              @click="submitComment"
+              class="rounded-full bg-blue-600 px-5 py-2.5 text-sm font-semibold text-white shadow-sm transition hover:bg-blue-700"
+            >
+              댓글 등록
+            </button>
+          </div>
+        </div>
+      </div>
     </div>
   </div>
 
@@ -145,7 +183,7 @@
 <script setup lang="ts">
 import { ref, onMounted } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
-import { fetchPostById, deletePost } from '@/apis/posts'
+import { fetchPostById, deletePost, fetchComments, createComment } from '@/apis/posts'
 
 const route = useRoute()
 const router = useRouter()
@@ -153,6 +191,8 @@ const router = useRouter()
 const id = route.params.id as string
 
 const post = ref<any>(null)
+const comments = ref<any[]>([])
+const newComment = ref('')
 
 const loadPost = async () => {
   try {
@@ -163,6 +203,32 @@ const loadPost = async () => {
     console.error('게시글 조회 실패', error)
 
     post.value = null
+  }
+}
+
+const loadComments = async () => {
+  try {
+    const res = await fetchComments(id)
+    comments.value = res.data
+  } catch (error) {
+    console.error('댓글 조회 실패', error)
+    comments.value = []
+  }
+}
+
+const submitComment = async () => {
+  if (!newComment.value.trim()) {
+    alert('댓글 내용을 입력해주세요.')
+    return
+  }
+
+  try {
+    await createComment({ post_id: id, content: newComment.value.trim() })
+    newComment.value = ''
+    await loadComments()
+  } catch (error) {
+    console.error('댓글 등록 실패', error)
+    alert('댓글 등록에 실패했습니다.')
   }
 }
 
@@ -201,5 +267,6 @@ const confirmDelete = async () => {
 
 onMounted(() => {
   loadPost()
+  loadComments()
 })
 </script>

@@ -41,3 +41,13 @@ export const deletePost = (
     },
   })
 }
+
+export const fetchComments = (postId: number | string) => {
+  return axiosInstance.get('/comments', {
+    params: { post_id: postId },
+  })
+}
+
+export const createComment = (payload: { post_id: number | string; content: string }) => {
+  return axiosInstance.post('/comments/', payload)
+}
