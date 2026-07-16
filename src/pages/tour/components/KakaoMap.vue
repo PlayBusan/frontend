@@ -1,5 +1,5 @@
 <template>
-  <div ref="mapContainer" class="w-full h-screen rounded-xl"></div>
+  <div ref="mapContainer"  class="absolute inset-0 z-0"></div>
 </template>
 
 <script setup lang="ts">
