@@ -16,7 +16,7 @@
           <div>
             <!-- 카테고리 -->
             <span
-              class="inline-flex rounded-full bg-blue-50 px-3 py-1 text-xs font-semibold text-blue-700"
+              class="inline-flex rounded-full bg-secondary/20 px-3 py-1 text-xs font-semibold text-primary"
             >
               {{ post.category }}
             </span>
@@ -62,14 +62,17 @@
             @click="goEdit"
             class="
               rounded-xl
-              bg-yellow-100
+              bg-white
+              !border
+              !border-primary
+              !border-solid
               px-4
               py-1
               text-sm
               font-semibold
-              text-orange-700
+              text-primary
               transition
-              hover:bg-yellow-200
+              hover:bg-secondary/20
               active:scale-95
             "
           >
@@ -80,14 +83,14 @@
             @click="removePost"
             class="
               rounded-xl
-              bg-pink-100
+              bg-red-700
               px-4
               py-1
               text-sm
               font-semibold
-              text-red-600
+              text-white
               transition
-              hover:bg-pink-200
+              hover:bg-red-800
               active:scale-95
             "
           >
@@ -134,7 +137,7 @@
           <div class="mt-4 flex justify-end">
             <button
               @click="submitComment"
-              class="rounded-full bg-blue-600 px-5 py-2.5 text-sm font-semibold text-white shadow-sm transition hover:bg-blue-700"
+              class="rounded-full bg-primary px-5 py-2.5 text-sm font-semibold text-white shadow-sm transition hover:bg-blue-700"
             >
               댓글 등록
             </button>
