@@ -1,6 +1,6 @@
 <template>
   <aside
-    class="absolute left-5 top-5 z-20 h-[90vh] rounded-lg w-auto overflow-y-auto bg-white shadow-xl"
+    class="absolute left-5 top-20 z-20 h-[90vh] rounded-lg w-auto overflow-y-auto bg-white shadow-xl"
   >
     <div class="p-5 w-100">
       <div class="mb-5">
