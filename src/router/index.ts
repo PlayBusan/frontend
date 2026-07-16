@@ -8,6 +8,7 @@ import LocalPostDetail from '@/pages/local/LocalPostDetail.vue'
 import LocalWritePage from '@/pages/local/LocalWritePage.vue'
 import LocalEditPage from '@/pages/local/LocalEditPage.vue'
 import TourPage from '@/pages/tour/TourPage.vue'
+import NotFound from '@/pages/NotFound.vue'
 
 const router = createRouter({
   history: createWebHistory(),
@@ -51,8 +52,11 @@ const router = createRouter({
     {path: '/tour',
       name: 'tour',
       component: TourPage,
-    },
-  ],
+    },    {
+      path: '/:pathMatch(.*)*',
+      name: 'NotFound',
+      component: NotFound,
+    },  ],
 })
 
 export default router
