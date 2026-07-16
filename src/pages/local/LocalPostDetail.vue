@@ -60,14 +60,36 @@
         <div class="mt-8 flex justify-end gap-3 border-t border-slate-100 pt-6">
           <button
             @click="goEdit"
-            class="rounded-xl bg-blue-600 px-6 py-3 text-sm font-semibold text-white transition hover:bg-blue-700 active:scale-95"
+            class="
+              rounded-xl
+              bg-yellow-100
+              px-4
+              py-1
+              text-sm
+              font-semibold
+              text-orange-700
+              transition
+              hover:bg-yellow-200
+              active:scale-95
+            "
           >
             수정
           </button>
 
           <button
             @click="removePost"
-            class="rounded-xl bg-red-500 px-6 py-3 text-sm font-semibold text-white transition hover:bg-red-600 active:scale-95"
+            class="
+              rounded-xl
+              bg-pink-100
+              px-4
+              py-1
+              text-sm
+              font-semibold
+              text-red-600
+              transition
+              hover:bg-pink-200
+              active:scale-95
+            "
           >
             삭제
           </button>
