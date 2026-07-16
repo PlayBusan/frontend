@@ -90,46 +90,252 @@ import FullCalendar from '@fullcalendar/vue3'
 import dayGridPlugin from '@fullcalendar/daygrid'
 import interactionPlugin from '@fullcalendar/interaction'
 
-import { ref, computed } from 'vue'
+import { ref, computed, onMounted } from 'vue'
+import { getFestivalsByMonth } from '@/apis/festivalApi'
 
-const sideEvents = [
-  { title: '부산 바다축제', period: '07.01 — 07.03' },
-  { title: '나이트 뮤직 페스타', period: '07.07 — 07.08' },
-  { title: '비프광장 야시장', period: '07.12 — 07.16' },
-  { title: '광안리 드론쇼', period: '07.15 — 07.15' },
-]
 
-const currentYearMonth = ref({ year: 2026, month: 7 })
+/**
+ * 현재 조회 년/월
+ */
+const currentYearMonth = ref({
+  year: 2026,
+  month: 7,
+})
 
+
+/**
+ * FullCalendar 이벤트 데이터
+ */
+const calendarEvents = ref<any[]>([])
+
+
+/**
+ * 왼쪽 Upcoming 리스트 데이터
+ */
+const sideEvents = ref<any[]>([])
+
+
+/**
+ * 현재 월 표시
+ */
 const currentMonthText = computed(() => {
   return `${currentYearMonth.value.month}월`
 })
 
+
+/**
+ * 백엔드 날짜 변환
+ * 20260723 -> 2026-07-23
+ */
+const formatDate = (date: string) => {
+
+  if (!date) return ''
+
+  return `${date.slice(0, 4)}-${date.slice(4, 6)}-${date.slice(6, 8)}`
+}
+
+/**
+ * FullCalendar 종료일 변환
+ * FullCalendar end는 exclusive이므로 하루 추가
+ */
+const formatEndDate = (date: string) => {
+
+  if (!date) return ''
+
+  const year = Number(date.slice(0,4))
+  const month = Number(date.slice(4,6)) - 1
+  const day = Number(date.slice(6,8))
+
+
+  const endDate = new Date(
+    year,
+    month,
+    day
+  )
+
+
+  // 마지막 날짜 포함 처리
+  endDate.setDate(
+    endDate.getDate() + 1
+  )
+
+
+  return `${endDate.getFullYear()}-${String(
+    endDate.getMonth() + 1
+  ).padStart(2,'0')}-${String(
+    endDate.getDate()
+  ).padStart(2,'0')}`
+
+}
+
+
+/**
+ * FullCalendar 이벤트 변환
+ */
+const convertCalendarEvents = (festivals: any[]) => {
+
+  return festivals.map((festival) => ({
+
+    title: festival.title,
+
+    start: formatDate(
+      festival.start_date
+    ),
+
+    end: formatEndDate(
+      festival.end_date
+    ),
+    
+    extendedProps: {
+      contentId: festival.content_id,
+      address: festival.addr1,
+    },
+
+  }))
+}
+
+
+
+/**
+ * 축제 달력 API 조회
+ */
+const fetchFestivalCalendar = async () => {
+
+  try {
+
+    const {
+      year,
+      month,
+    } = currentYearMonth.value
+
+
+    const response =
+      await getFestivalsByMonth(
+        year,
+        month
+      )
+
+
+    console.log(
+      '축제 캘린더 응답:',
+      response.data
+    )
+
+
+    const festivals =
+      response.data.data
+
+
+
+    // FullCalendar 데이터 적용
+    calendarEvents.value =
+      convertCalendarEvents(
+        festivals
+      )
+
+
+
+    // 왼쪽 UPCOMING 데이터 적용
+    sideEvents.value =
+      festivals.map((festival: any) => ({
+
+        title: festival.title,
+
+        period:
+          `${festival.start_date.slice(4,6)}.${festival.start_date.slice(6,8)}
+          —
+          ${festival.end_date.slice(4,6)}.${festival.end_date.slice(6,8)}`
+
+      }))
+
+
+  } catch(error) {
+
+    console.error(
+      '축제 캘린더 조회 실패:',
+      error
+    )
+
+  }
+
+}
+
+
+
+/**
+ * FullCalendar 옵션
+ */
 const calendarOptions = ref({
-  plugins: [dayGridPlugin, interactionPlugin],
-  initialView: 'dayGridMonth',
-  headerToolbar: {
-    left: '',
-    center: 'prev title next',
-    right: '',
-  },
-  datesSet: (arg: any) => {
-    const currentActiveDate = arg.view.currentStart
-    currentYearMonth.value = {
-      year: currentActiveDate.getFullYear(),
-      month: currentActiveDate.getMonth() + 1,
-    }
-  },
-  events: [
-    { title: '부산 바다축제', start: '2026-07-01', end: '2026-07-03' },
-    { title: '나이트 뮤직 페스타', start: '2026-07-07', end: '2026-07-08' },
-    { title: '비프광장 야시장', start: '2026-07-12', end: '2026-07-16' },
-    { title: '광안리 드론쇼', start: '2026-07-15', end: '2026-07-15' },
+
+  plugins: [
+    dayGridPlugin,
+    interactionPlugin,
   ],
+
+
+  initialView: 'dayGridMonth',
+
+
+  headerToolbar: {
+
+    left: '',
+
+    center: 'prev title next',
+
+    right: '',
+
+  },
+
+
+  /**
+   * 이전/다음 달 이동 감지
+   */
+  datesSet: async (arg: any) => {
+
+    const currentActiveDate =
+      arg.view.currentStart
+
+
+    currentYearMonth.value = {
+
+      year:
+        currentActiveDate.getFullYear(),
+
+      month:
+        currentActiveDate.getMonth() + 1,
+
+    }
+
+
+    await fetchFestivalCalendar()
+
+  },
+
+
+  /**
+   * API 이벤트 연결
+   */
+  events: calendarEvents,
+
+
   dayMaxEventRows: true,
-  // [수정] 고정 높이 비율 대신 'auto'를 부여해 달력 셀 크기와 여백에 맞춰 전체 높이가 유동적으로 확장되도록 변경
+
+
   height: 'auto',
+
 })
+
+
+
+/**
+ * 최초 진입
+ */
+onMounted(() => {
+
+  fetchFestivalCalendar()
+
+})
+
 </script>
 
 <style scoped>
