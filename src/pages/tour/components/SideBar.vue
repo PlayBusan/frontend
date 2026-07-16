@@ -2,7 +2,7 @@
   <aside
     class="absolute left-5 top-5 z-20 h-[90vh] rounded-lg w-auto overflow-y-auto bg-white shadow-xl"
   >
-    <div class="p-5">
+    <div class="p-5 w-100">
       <div class="mb-5">
         <span class="text-sm text-gray-500 font-semibold">지금 부산은 축제 중!</span>
         <h2 class="mb-5 text-xl font-bold text-primary">7월 축제 둘러보기😎</h2>
