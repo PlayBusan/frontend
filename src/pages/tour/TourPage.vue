@@ -1,28 +1,43 @@
 <template>
   <div class="relative h-screen">
-    <!-- SideBar 클릭 시 handleSelectFestival 실행 -->
     <SideBar :festivals="festivals" @selectFestival="handleSelectFestival" />
 
-    <!-- KakaoMap @selectFestival 클릭 시에도 동일하게 handleSelectFestival 실행 -->
-    <KakaoMap 
+    <KakaoMap
       ref="mapRef"
-      @loadedFestivals="festivals = $event" 
-      @selectFestival="handleSelectFestival" 
+      @loadedFestivals="handleLoadedFestivals"
+      @selectFestival="handleSelectFestival"
     />
-
   </div>
 </template>
 
 <script setup lang="ts">
 import { ref } from 'vue'
-import axios from 'axios' // 프로젝트에서 사용하시는 axios 인스턴스 혹은 API 유틸로 대체하세요.
+import axios from 'axios'
 import KakaoMap from './components/KakaoMap.vue'
-import FestivalCard from '@/pages/home/components/FestivalCard.vue'
 import SideBar from './components/SideBar.vue'
 
 const festivals = ref<any[]>([])
 const selectedFestival = ref<any>(null)
 const mapRef = ref<InstanceType<typeof KakaoMap> | null>(null)
+
+const normalizeFestival = (festival: any) => ({
+  ...festival,
+  content_id: festival.content_id || festival.contentid || festival.contentid || '',
+  title: festival.title || festival.name || '',
+  image:
+    festival.image ||
+    festival.first_image ||
+    festival.firstimage ||
+    festival.first_image2 ||
+    festival.firstimage2 ||
+    '',
+  address: festival.addr1 || festival.address || festival.addr || '',
+  description: festival.overview || festival.description || festival.tel || festival.intro || '',
+})
+
+const handleLoadedFestivals = (loaded: any[]) => {
+  festivals.value = loaded.map(normalizeFestival)
+}
 
 /**
  * [상세 API 호출] 클릭한 축제의 ID를 받아 상세 정보를 조회합니다.
@@ -57,13 +72,13 @@ const handleSelectFestival = async (festival: any) => {
   if (contentId && contentId !== 'selected-hotplace') {
     const detailedData = await fetchFestivalDetail(contentId)
     if (detailedData) {
-      selectedFestival.value = detailedData // 상세 정보 바인딩 -> 카드 출력
+      selectedFestival.value = normalizeFestival(detailedData)
     } else {
-      selectedFestival.value = festival // API 조회 실패 시 폴백 데이터로 세팅
+      selectedFestival.value = normalizeFestival(festival)
     }
   } else {
     // 핫플레이스 다이렉트 진입 등 ID가 없는 예외 케이스 처리
-    selectedFestival.value = festival
+    selectedFestival.value = normalizeFestival(festival)
   }
 }
 </script>

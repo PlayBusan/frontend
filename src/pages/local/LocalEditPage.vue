@@ -33,12 +33,12 @@
             class="
               inline-flex
               rounded-full
-              bg-blue-50
+              bg-secondary/20
               px-3
               py-1
               text-xs
               font-semibold
-              text-blue-700
+              text-primary
             "
           >
             게시글 수정
@@ -317,7 +317,7 @@
               type="submit"
               class="
                 rounded-xl
-                bg-blue-500
+                bg-primary/90
                 px-6
                 py-2.5
                 text-sm
@@ -325,7 +325,7 @@
                 text-white
                 shadow-sm
                 transition
-                hover:bg-blue-600
+                hover:bg-primary
                 active:scale-95
               "
             >

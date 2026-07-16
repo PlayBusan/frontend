@@ -51,6 +51,7 @@ defineExpose({
 const createMarker = (
   map: any,
   festival: {
+    content_id?: string | number
     title: string
     address: string
     image: string
@@ -142,6 +143,11 @@ const createMarker = (
     window.kakao.maps.event.addListener(marker, 'mouseout', () => {
       overlay.setMap(null)
     })
+
+    // 마커 클릭 시 선택 이벤트 emit
+    window.kakao.maps.event.addListener(marker, 'click', () => {
+      emit('selectFestival', festival)
+    })
   })
 }
 
@@ -159,16 +165,23 @@ onMounted(async () => {
   const title = route.query.title as string
   const address = route.query.address as string
   const image = route.query.image as string
+  const contentId = route.query.contentId as string
 
   // ==========================================
   // CASE 1: 다른 페이지(HotPlace 등)에서 쿼리를 들고 진입한 경우
   // ==========================================
-  if (address) {
+  if (address || contentId) {
     const selectedFestival = {
-      content_id: 'selected-hotplace',
+      content_id: contentId || 'selected-hotplace',
       title: title,
       addr1: address,
-      first_image: image || 'https://images.unsplash.com/photo-1582967788606-a171c1080cb0?auto=format&fit=crop&w=600&q=80'
+      first_image:
+        image ||
+        'https://images.unsplash.com/photo-1582967788606-a171c1080cb0?auto=format&fit=crop&w=600&q=80',
+      image:
+        image ||
+        'https://images.unsplash.com/photo-1582967788606-a171c1080cb0?auto=format&fit=crop&w=600&q=80',
+      address,
     }
 
     emit('loadedFestivals', [selectedFestival])
@@ -179,9 +192,10 @@ onMounted(async () => {
     createMarker(
       mapInstance,
       {
+        content_id: selectedFestival.content_id,
         title,
         address,
-        image,
+        image: selectedFestival.image,
       },
       true,
     )
@@ -200,6 +214,7 @@ onMounted(async () => {
 
   randomFestivals.forEach((festival) => {
     createMarker(mapInstance, {
+      content_id: festival.content_id,
       title: festival.title,
       address: festival.addr1,
       image:
